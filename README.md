@@ -29,8 +29,8 @@ The best way to install the Editor is simply by the "nal_editorv1.0.exe" file.
 Run the executable file and it will run the Editor.
 The NAL Editor is a simple text editor where the assembly codes can be typed and saved.
 The codes are saved as ".nal" file.
-The Documentation can be viewed from "Commands>Opcodes"
-Saved "<filename>.nal" file can be compiled using "Commands>Compile"
+The Documentation can be viewed from "Commands>Opcodes".
+Saved "<filename>.nal" file can be compiled using "Commands>Compile".
 Max allowed instructions is 256.
 Compiled files are saved as "<filename>.nac" files in compiled directory in app installation folder.
 Install Logisim-Evolution, load the "MPU.circ" file from "Nano MPU Logisim" folder.
