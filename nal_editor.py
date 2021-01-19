@@ -230,6 +230,7 @@ class NALEditor:
 			
 		try:
 			NALEditor.compiler.compile(codes, NALEditor.compiler.opcodes, nac_file)
+			showinfo("Success", "Successfully Compiled 1 File\n At '%s'" % nac_file)
 		except:
 			showinfo("Compiler Error", "Unrecognized Instruction -> %s" % NALEditor.compiler.error)
 			raise Exception("Error: Compilation Failed")
@@ -240,5 +241,5 @@ class NALEditor:
 		self.__root.mainloop()
 
 # run main application
-notepad = NALEditor(width = 300, height = 400)
-notepad.run()
+nal_editor = NALEditor(width = 300, height = 400)
+nal_editor.run()
