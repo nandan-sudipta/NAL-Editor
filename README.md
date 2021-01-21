@@ -37,3 +37,24 @@ Install Logisim-Evolution, load the "MPU.circ" file from "Nano MPU Logisim" fold
 Load the ".nac" file in the ROM module inside MPU circuit and start the simulaton.
 Turn On the PROG pin and DBG pin and wait for the program to load in MPU.
 Turn Off the PROG pin and DBG pin, the computation will start.
+
+# Nano MPU
+The MPU is based on Ben-Eater's 8 bit CPU.
+The MPU can calculate upto 8 bits unsigned number.
+The Opcodes of the MPU are 8 bits long.
+The MPU consists of following registers:
+    1. A Register
+    2. B Register
+    3. Output Register
+    4. Flag Register
+Data can be processed to and from both the registers.
+The MPU has an in built RAM of 256 bytes.
+The internal RAM can be filled with instructions using an external RAM of same size.
+The MPU can perform following mathematical operations:
+    1. Addition
+    2. Subtraction
+    3. Bitwise AND
+    4. Bitwise OR
+The MPU can perform following functions:
+    1. Move data among Registers and RAM
+    2. Jump to a subroutine present in a memory address
