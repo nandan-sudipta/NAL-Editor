@@ -153,6 +153,7 @@ class NALEditor:
 		txt.set(NALEditor.docu.strip())
 		msg.pack()
 
+    # defines __openFile() function
 	def __openFile(self):
 		self.__file = askopenfilename(defaultextension = ".nal", filetypes = [("Nano Files", "*.nal*"), ("All Files", "*.*")])
 		if self.__file == "":
