@@ -3,11 +3,11 @@ from enum import Enum, unique
 
 @unique
 class Instructions(Enum):
-    HLT = "00"
-    OUTL = "01"
-    OUTR = "02"
-    OUTA = "03"
-    OUTB = "04"
+    HLT = "0"
+    OUTL = "1"
+    OUTR = "2"
+    OUTA = "3"
+    OUTB = "4"
     MOVLA = "11"
     MOVLB = "12"
     MOVRA = "13"
@@ -53,6 +53,28 @@ class Register:
         return hex(self.value)
 
 
+class Counter:
+    def __init__(self, bit_width: BitWidth):
+        self.bitWidth = bit_width
+        self.maxValue = self.bitWidth.max_value()
+        self.value = 0
+
+    def set_counter(self, address: int):
+        assert 0 <= address <= self.maxValue
+        self.value = address
+
+    def get_counter(self):
+        return self.value
+
+    def inc_counter(self):
+        self.value += 1
+        if self.value > self.maxValue:
+            self.value = 0
+
+    def __str__(self):
+        return hex(self.value)
+
+
 class RAM:
     def __init__(self, address_width: BitWidth, data_width: BitWidth):
         self.addressWidth = address_width
@@ -82,6 +104,7 @@ class RAM:
 
 class CPU:
     def __init__(self):
+        self.pc = Counter(BitWidth.EIGHT_BIT)
         self.reg_a = Register(BitWidth.EIGHT_BIT)
         self.reg_b = Register(BitWidth.EIGHT_BIT)
         self.reg_out = Register(BitWidth.EIGHT_BIT)
@@ -90,18 +113,16 @@ class CPU:
 
         self.enable = True
 
-        self.current_instruction = None
-        self.current_instruction_decoded = None
+        self.current_instruction = ""
+        self.current_instruction_decoded = ""
 
-        self.program_counter = 0
-
-    def get_counter(self):
-        return self.program_counter
+    def is_enabled(self):
+        return self.enable
 
     def set_instructions(self, commands: list):
         commands = [int(c, 16) for c in commands]
 
-        self.program_counter = 0
+        self.pc.set_counter(0)
         self.reg_a.set_value(0)
         self.reg_b.set_value(0)
         self.reg_out.set_value(0)
@@ -114,4 +135,26 @@ class CPU:
 
     def fetch(self):
         self.current_instruction = self.ram_mem.read(
-            self.program_counter)
+            self.pc.get_counter())
+
+    def decode(self):
+        self.current_instruction_decoded = Instructions.find_instruction(
+            self.current_instruction)
+        self.pc.inc_counter()
+
+    def execute(self):
+        i = self.current_instruction_decoded
+
+        if i == Instructions.HLT:
+            self.enable = False
+
+        elif i == Instructions.OUTL:
+            arg = int(self.ram_mem.read(self.pc.get_counter()), 16)
+            self.reg_out.set_value(arg)
+            self.pc.inc_counter()
+
+        elif i == Instructions.OUTR:
+            arg = int(self.ram_mem.read(self.pc.get_counter()), 16)
+            arg_decoded = int(self.ram_mem.read(arg), 16)
+            self.reg_out.set_value(arg_decoded)
+            self.pc.inc_counter()
