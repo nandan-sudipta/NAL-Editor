@@ -49,6 +49,9 @@ class Register:
         assert 0 <= value <= self.maxValue
         self.value = value
 
+    def get_value(self):
+        return self.value
+
     def __str__(self):
         return hex(self.value)
 
@@ -86,7 +89,7 @@ class RAM:
     def read(self, address: int):
         if not (0 <= address <= self.addressMaxValue):
             raise RuntimeError("Invalid Address: " + hex(address))
-        return hex(self.memory.get(address, 0))
+        return self.memory.get(address, 0)
 
     def write(self, address: int, value: int):
         assert 0 <= address <= self.addressMaxValue
@@ -97,7 +100,7 @@ class RAM:
         output_str = ""
         for row in range(32):
             for col in range(8):
-                output_str += self.read(row * 8 + col) + "\t"
+                output_str += hex(self.read(row * 8 + col)) + "\t"
             output_str += "\n"
         return output_str
 
@@ -149,12 +152,94 @@ class CPU:
             self.enable = False
 
         elif i == Instructions.OUTL:
-            arg = int(self.ram_mem.read(self.pc.get_counter()), 16)
+            arg = self.ram_mem.read(self.pc.get_counter())
             self.reg_out.set_value(arg)
             self.pc.inc_counter()
 
         elif i == Instructions.OUTR:
-            arg = int(self.ram_mem.read(self.pc.get_counter()), 16)
-            arg_decoded = int(self.ram_mem.read(arg), 16)
-            self.reg_out.set_value(arg_decoded)
+            arg = self.ram_mem.read(self.pc.get_counter())
+            arg_mem = self.ram_mem.read(arg)
+            self.reg_out.set_value(arg_mem)
             self.pc.inc_counter()
+
+        elif i == Instructions.OUTA:
+            arg_a = self.reg_a.get_value()
+            self.reg_out.set_value(arg_a)
+
+        elif i == Instructions.OUTB:
+            arg_b = self.reg_b.get_value()
+            self.reg_out.set_value(arg_b)
+
+        elif i == Instructions.MOVLA:
+            arg = self.ram_mem.read(self.pc.get_counter())
+            self.reg_a.set_value(arg)
+            self.pc.inc_counter()
+
+        elif i == Instructions.MOVLB:
+            arg = self.ram_mem.read(self.pc.get_counter())
+            self.reg_b.set_value(arg)
+            self.pc.inc_counter()
+
+        elif i == Instructions.MOVRA:
+            arg = self.ram_mem.read(self.pc.get_counter())
+            arg_mem = self.ram_mem.read(arg)
+            self.reg_a.set_value(arg_mem)
+            self.pc.inc_counter()
+
+        elif i == Instructions.MOVRB:
+            arg = self.ram_mem.read(self.pc.get_counter())
+            arg_mem = self.ram_mem.read(arg)
+            self.reg_b.set_value(arg_mem)
+            self.pc.inc_counter()
+
+        elif i == Instructions.MOVAR:
+            arg = self.ram_mem.read(self.pc.get_counter())
+            arg_a = self.reg_a.get_value()
+            self.ram_mem.write(arg, arg_a)
+            self.pc.inc_counter()
+
+        elif i == Instructions.MOVBR:
+            arg = self.ram_mem.read(self.pc.get_counter())
+            arg_b = self.reg_b.get_value()
+            self.ram_mem.write(arg, arg_b)
+            self.pc.inc_counter()
+
+        elif i == Instructions.ADDA:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_a.set_value(arg_a+arg_b)
+
+        elif i == Instructions.ADDB:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_b.set_value(arg_a+arg_b)
+
+        elif i == Instructions.SUBBA:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_a.set_value(arg_a-arg_b)
+
+        elif i == Instructions.SUBAB:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_b.set_value(arg_b-arg_a)
+
+        elif i == Instructions.ANDA:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_a.set_value(arg_a & arg_b)
+
+        elif i == Instructions.ANDB:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_b.set_value(arg_a & arg_b)
+
+        elif i == Instructions.ORA:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_b.set_value(arg_a | arg_b)
+
+        elif i == Instructions.ORB:
+            arg_a = self.reg_a.get_value()
+            arg_b = self.reg_b.get_value()
+            self.reg_b.set_value(arg_a | arg_b)
