@@ -116,8 +116,8 @@ class CPU:
 
         self.enable = True
 
-        self.current_instruction = ""
-        self.current_instruction_decoded = ""
+        self.current_instruction = 0
+        self.current_instruction_decoded = 0
 
     def is_enabled(self):
         return self.enable
@@ -142,7 +142,7 @@ class CPU:
 
     def decode(self):
         self.current_instruction_decoded = Instructions.find_instruction(
-            self.current_instruction)
+            hex(self.current_instruction))
         self.pc.inc_counter()
 
     def execute(self):
@@ -243,3 +243,23 @@ class CPU:
             arg_a = self.reg_a.get_value()
             arg_b = self.reg_b.get_value()
             self.reg_b.set_value(arg_a | arg_b)
+
+    def __str__(self):
+        output_str = ""
+
+        output_str += "RegA:\t"+self.reg_a.__str__()+"\n"
+        output_str += "RegB:\t"+self.reg_b.__str__()+"\n"
+        output_str += "  PC:\t"+self.pc.__str__()+"\n"
+        output_str += " RAM:\n"+self.ram_mem.__str__()+"\n"
+        return output_str
+
+
+testcommands = ["11", "a"]
+cpu = CPU()
+cpu.set_instructions(testcommands)
+while cpu.is_enabled():
+    cpu.fetch()
+    cpu.decode()
+    cpu.execute()
+
+    print(cpu)
