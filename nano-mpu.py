@@ -1,13 +1,15 @@
 from enum import Enum, unique
+import curses
+from curses import wrapper
 
 
 @unique
 class Instructions(Enum):
-    HLT = "0"
-    OUTL = "1"
-    OUTR = "2"
-    OUTA = "3"
-    OUTB = "4"
+    HLT = "00"
+    OUTL = "01"
+    OUTR = "02"
+    OUTA = "03"
+    OUTB = "04"
     MOVLA = "11"
     MOVLB = "12"
     MOVRA = "13"
@@ -53,7 +55,7 @@ class Register:
         return self.value
 
     def __str__(self):
-        return hex(self.value)
+        return format(self.value, '#04X')
 
 
 class Counter:
@@ -75,7 +77,7 @@ class Counter:
             self.value = 0
 
     def __str__(self):
-        return hex(self.value)
+        return format(self.value, '#04X')
 
 
 class RAM:
@@ -98,9 +100,11 @@ class RAM:
 
     def __str__(self):
         output_str = ""
-        for row in range(32):
-            for col in range(8):
-                output_str += hex(self.read(row * 8 + col)) + "\t"
+        for row in range(16):
+            output_str += format(row*16, '#04X')+": "
+            for col in range(16):
+                output_str += format(self.read(row * 16 + col),
+                                     '#04X')[2:] + " "
             output_str += "\n"
         return output_str
 
@@ -142,7 +146,7 @@ class CPU:
 
     def decode(self):
         self.current_instruction_decoded = Instructions.find_instruction(
-            hex(self.current_instruction))
+            format(self.current_instruction, '#04X'))
         self.pc.inc_counter()
 
     def execute(self):
@@ -250,16 +254,5 @@ class CPU:
         output_str += "RegA:\t"+self.reg_a.__str__()+"\n"
         output_str += "RegB:\t"+self.reg_b.__str__()+"\n"
         output_str += "  PC:\t"+self.pc.__str__()+"\n"
-        output_str += " RAM:\n"+self.ram_mem.__str__()+"\n"
+        output_str += " RAM:\n\n"+self.ram_mem.__str__()+"\n"
         return output_str
-
-
-testcommands = ["11", "a"]
-cpu = CPU()
-cpu.set_instructions(testcommands)
-while cpu.is_enabled():
-    cpu.fetch()
-    cpu.decode()
-    cpu.execute()
-
-    print(cpu)
